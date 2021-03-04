@@ -1,38 +1,27 @@
-﻿using Api.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading.Tasks;
+# .NET Core DI (injeção de dependência) 
+ Esse repositório contem um projeto .NET 5, com alguns exemplos práticos demonstrando como retornar o StatusCode de uma Controller com os verbos RESTful.
 
-namespace Api.Controllers
-{
-    [ApiController]
-    [Route("[controller]")]
-    public class NoticiasController : ControllerBase
-    {
-        private static readonly ICollection<Noticia> noticias = new Collection<Noticia>
-        {
-            new Noticia
-            {
-                Id = 1,
-                Titulo = "Titulo 1"
-            },
-            new Noticia
-            {
-                Id = 2,
-                Titulo = "Titulo 2"
-            },
-            new Noticia
-            {
-                Id = 3,
-                Titulo = "Titulo 3"
-            }
-        };
+## Motivação
 
-        [HttpGet]
+Os códigos de status das respostas HTTP indicam se uma requisição *HTTP* foi corretamente concluída. 
+A seguir vocês tem um lista contendo as respostas agrupadas em cinco classes:
+
+* Respostas de informação (100-199),
+* Respostas de sucesso (200-299),
+* Redirecionamentos (300-399)
+* Erros do cliente (400-499)
+* Erros do servidor (500-599).
+
+### Implementando os retornos 
+
+Para validar os retornos dos verbos de uma API *RESTful* eu criei uma controller chamada: `NoticiasController` com os verbos mais utilizados no nosso dia a dia Get, GetById, Post, PUT e Delete. A seguir você tem um exemplo de cada uma delas.
+
+```Csharp
+/*
+ Get verificando se tem algum registro no banco, caso não ele retorna o Status 204 No Content caso sim um 200 com os resultados 
+ */
+
+ [HttpGet]
         public IActionResult Get()
         {
             var response = noticias.ToList();
@@ -46,9 +35,14 @@ namespace Api.Controllers
                 data = response
             });
         }
+```
 
+```Csharp
+/*
+ GetById segui o mesmo fluxo do Get verificando se tem algum registro no banco, caso não ele retorna o Status 204 No Content caso sim um 200 com os resultados 
+ */
 
-        [HttpGet("{id}")]
+ [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
             var response = noticias.FirstOrDefault(x => x.Id == id);
@@ -62,9 +56,14 @@ namespace Api.Controllers
                 data = response
             });
         }
+```
 
+```Csharp
+/*
+No post nos verificamos se ocorreu algum erro, caso sim, retornamos o Status 500 com uma exception do que aconteceu, caso não, retornamos o Status 200 e uma string informando o sucesso.
+ */
 
-        [HttpPost]
+ [HttpPost]
         public IActionResult Post([FromBody] Noticia request)
         {
             try
@@ -82,8 +81,15 @@ namespace Api.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+```
 
-        [HttpPut]
+
+```Csharp
+/*
+No put nós temos uma verificação a mais do que nos outros fluxos, não verificamos se nada foi atualizado, se os registros são identicos, caso sim ele retorna o Status 304.
+ */
+
+ [HttpPut]
         public IActionResult Put(int id, [FromBody] Noticia request)
         {
             try
@@ -94,7 +100,7 @@ namespace Api.Controllers
                     return NoContent();
 
 
-                if (result.Equals(request))
+               if (result.Equals(request))
                     return StatusCode(304, "O conteudo esta com o mesmo valor!");
 
 
@@ -113,10 +119,16 @@ namespace Api.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+```
 
 
+```Csharp
+/*
+ No Delete nós trabalhamos com os tatus 204 verificando se não existe aquele registro e 200 caso o registro exista e podemos deletar ele ou o 500 em caso de erro
+ */
 
-        [HttpDelete("{id}")]
+
+ [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var result = noticias.FirstOrDefault(x => x.Id == id);
@@ -135,5 +147,5 @@ namespace Api.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-    }
-}
+ 
+```
