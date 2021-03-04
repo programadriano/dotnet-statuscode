@@ -1,4 +1,4 @@
-# .NET Core DI (injeção de dependência) 
+# .NET Core StatusCode 
  Esse repositório contem um projeto .NET 5, com alguns exemplos práticos demonstrando como retornar o StatusCode de uma Controller com os verbos RESTful.
 
 ## Motivação
